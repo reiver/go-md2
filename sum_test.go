@@ -1,0 +1,146 @@
+package md2_test
+
+import (
+	"testing"
+
+	"github.com/reiver/go-md2"
+)
+
+func TestSum(t *testing.T) {
+
+	tests := []struct{
+		Data []byte
+		Expected [md2.Size]byte
+	}{
+		{
+			Data: nil,
+			Expected: [md2.Size]byte{0x83,0x50,0xe5,0xa3,0xe2,0x4c,0x15,0x3d,0xf2,0x27,0x5c,0x9f,0x80,0x69,0x27,0x73},
+		},
+		{
+			Data: []byte(""),
+			Expected: [md2.Size]byte{0x83,0x50,0xe5,0xa3,0xe2,0x4c,0x15,0x3d,0xf2,0x27,0x5c,0x9f,0x80,0x69,0x27,0x73},
+		},
+
+
+
+		{
+			Data: []byte("Hello world!"),
+			Expected: [md2.Size]byte{0x63,0x50,0x3d,0x31,0x17,0xad,0x33,0xf9,0x41,0xd2,0x0f,0x57,0x14,0x4e,0xce,0x64},
+		},
+
+
+
+		{
+			Data: []byte("a"),
+			Expected: [md2.Size]byte{0x32,0xec,0x01,0xec,0x4a,0x6d,0xac,0x72,0xc0,0xab,0x96,0xfb,0x34,0xc0,0xb5,0xd1},
+		},
+		{
+			Data: []byte("ab"),
+			Expected: [md2.Size]byte{0x3c,0xa1,0x69,0xb4,0x43,0x85,0x24,0xc1,0x76,0x23,0x0d,0x89,0x97,0x1a,0x2a,0x81},
+		},
+		{
+			Data: []byte("abc"),
+			Expected: [md2.Size]byte{0xda,0x85,0x3b,0x0d,0x3f,0x88,0xd9,0x9b,0x30,0x28,0x3a,0x69,0xe6,0xde,0xd6,0xbb},
+		},
+
+		{
+			Data: []byte("abcdefghijklmnopqrstuvwxyz"),
+			Expected: [md2.Size]byte{0x4e,0x8d,0xdf,0xf3,0x65,0x02,0x92,0xab,0x5a,0x41,0x08,0xc3,0xaa,0x47,0x94,0x0b},
+		},
+
+
+
+		{
+			Data: []byte("message digest"),
+			Expected: [md2.Size]byte{0xab,0x4f,0x49,0x6b,0xfb,0x2a,0x53,0x0b,0x21,0x9f,0xf3,0x30,0x31,0xfe,0x06,0xb0},
+		},
+
+
+
+		{
+			Data: []byte("The quick brown fox jumps over the lazy dog"),
+			Expected: [md2.Size]byte{0x03,0xd8,0x5a,0x0d,0x62,0x9d,0x2c,0x44,0x2e,0x98,0x75,0x25,0x31,0x9f,0xc4,0x71},
+		},
+		{
+			Data: []byte("The quick brown fox jumps over the lazy cog"),
+			Expected: [md2.Size]byte{0x6b,0x89,0x0c,0x92,0x92,0x66,0x8c,0xdb,0xbf,0xda,0x00,0xa4,0xeb,0xf3,0x1f,0x05},
+		},
+
+
+
+		// This is longer than the MD2 block-size.
+		{
+			Data: []byte(
+`B Boom Boom
+B Boom Boom
+Bees keep on flying 'round the room
+M E Mer
+M E Mer
+Mother will help me if I ask her
+R Ra Ran
+R Ra Ran
+I will run faster than they can
+Ra Ran Rang
+Ra Ran Rang
+Put them together, it's boomerang!
+
+Bing bong bang
+Bing bong bang
+Bing bong bang it's boomerang
+Bing bong bang
+Bing bong bang
+Bing bong bang it's boomerang
+
+A boomerang
+A boomerang
+What does it do?
+What does it do?!
+It comes back to you.
+It comes back to you.
+A boomerang
+A boomerang
+Bing bong bang it's boomerang
+
+You throw a ball against the wall, and what does it do?
+It comes back to you, like a boomerang.
+Boomerang
+Bing bong bang it's boomerang
+We all have seen a trampoline, where you bounce so high,
+And back down you go, like a boomerang
+Boomerang
+Bing bong bang it's boomerang
+
+It's a funny looking thing
+Something like an airplane wing
+And when you throw it, ever so high
+So high it seems to hide in the sky
+It fools you with its special knack, of turning around and falling back
+
+A boomerang
+A boomerang
+What does it do?
+What does it do?!
+It comes back to you.
+It comes back to you.
+A boomerang
+A boomerang
+Bing bong bang it's boomerang`),
+			Expected: [md2.Size]byte{0xdc,0x07,0xb3,0x68,0x91,0xe5,0x63,0x01,0x88,0xfb,0xb9,0x5d,0x64,0x56,0x28,0x41},
+		},
+	}
+
+	for testNumber, test := range tests {
+
+		actual := md2.Sum(test.Data)
+
+		expected := test.Expected
+
+		if expected != actual {
+			t.Errorf("For test #%d, the actual md2-digest is not what was expected.", testNumber)
+			t.Logf("EXPECTED: %X", expected)
+			t.Logf("ACTUAL:   %X", actual)
+			t.Logf("DATA: %X", test.Data)
+			continue
+		}
+	}
+}
